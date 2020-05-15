@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="GraphQL.Conventions" Version="2.5.3" />
+      <PackageReference Include="Mapster" Version="5.3.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
+      <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.23" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Fless.EntityFramework\Fless.EntityFramework.csproj" />
+    </ItemGroup>
+
+</Project>

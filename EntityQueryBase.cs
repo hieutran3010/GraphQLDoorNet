@@ -5,7 +5,7 @@ namespace GraphQLDoorNet
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
-    using Fless.EntityFramework.Abstract;
+    using EFPostgresEngagement.Abstract;
     using Extensions;
     using Models;
 

@@ -7,11 +7,11 @@ This library requires .NET Core 3.x, SQL Database(PostgreSQL) - Currently, it ti
 
 ### Via Package manager
 ```sh
-dotnet add package GraphQLDoorNet
+Install-Package GraphQLDoorNet
 ```
 ### Via dotnet CLI
 ```sh
-Install-Package GraphQLDoorNet
+dotnet add package GraphQLDoorNet
 ```
 
 ## Initialization

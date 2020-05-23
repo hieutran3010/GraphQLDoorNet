@@ -26,6 +26,9 @@ namespace GraphQLDoorNet.Extensions
 
             services.AddScoped(typeof(TMutation));
             services.AddScoped(typeof(EntityMutationBase<,>));
+            services.AddScoped<IUserContext, DefaultUserContext>();
+            
+            services.AddScoped<IResolver, DefaultResolver>();
             
             var mutationTypes = Assembly.GetCallingAssembly().GetTypes()
                 .Where(t => t.GetCustomAttributes(typeof(MutationAttribute), true).Length > 0);
@@ -34,6 +37,8 @@ namespace GraphQLDoorNet.Extensions
             {
                 services.AddScoped(mutationType);
             }
+            
+            ObjectMapper.Mapping();
         }
     }
 }

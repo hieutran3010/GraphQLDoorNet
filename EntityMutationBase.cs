@@ -7,8 +7,8 @@
     using System.Linq.Dynamic.Core;
     using System.Linq;
     using Mapster;
-    using EFPostgresEngagement.Abstract;
     using Models;
+    using Abstracts;
 
     public class EntityMutationBase<T, TInput> where T : class, IEntityBase, new()
     {

@@ -5,9 +5,9 @@ namespace GraphQLDoorNet
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
-    using EFPostgresEngagement.Abstract;
     using Extensions;
     using Models;
+    using Abstracts;
 
     public class EntityQueryBase<T> where T : class, IEntityBase, new()
     {

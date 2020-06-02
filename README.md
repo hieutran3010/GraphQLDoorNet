@@ -3,7 +3,7 @@ When you build an api service, do you feel boring when repeatedly creating the s
 I don't explain detail about GraphQL, you can easy find the clearly documentation at link https://graphql.org/, https://graphql-dotnet.github.io/
 
 ## Installation
-This library requires .NET Core 3.x, SQL Database(PostgreSQL) - Currently, it tightly depends on [EFPostgresEngagement](https://github.com/hieutran3010/EFPostgresEngagement). In the near future, i will remove this dependency and support for all SQL Databases.
+This library requires .NET Core 3.x, Entity Framework Core that can integrated with any SQL database you want.
 
 ### Via Package manager
 ```sh
@@ -15,7 +15,11 @@ dotnet add package GraphQLDoorNet
 ```
 
 ## Initialization
-When mentioning to GraphQL, you have to define the Schema with Query and Mutation.
+- Implement for IRepository and IUnitOfWork (If you prefer using PostgreSQL, i suggest library [EFPostgresEngagement](https://github.com/hieutran3010/EFPostgresEngagement), it helps integration Entity Framework Core and PostgreSQL in some line of code)
+- Make sure you already registered IUnitOfWork in container, i recommend you should use transient, it will helpful for data consistency in asynchronous
+```c#
+services.AddTransient<GraphQLDoorNet.Abstracts.IUnitOfWork, GraphQLUnitOfWork>();
+```
 - Create the Query class and let's it inherits IQuery
 ```c#
 internal sealed class Query: IQuery
@@ -30,66 +34,30 @@ internal sealed class Mutation : IMutation
 ```
 - Create a controller as a door between GraphQL and database. This is only an example, you can modify anything as you want
 ```c#
-    using System.IO;
-    using System.Linq;
-    using System.Net;
     using System.Threading.Tasks;
-    using global::GraphQL.Conventions;
     using Microsoft.AspNetCore.Mvc;
+    using GraphQLDoorNet.Abstracts;
 
     [Route("api/graphql")]
     [ApiController]
     public class GraphQLController : ControllerBase
     {
-        private readonly GraphQLEngine engine;
-        private readonly IDependencyInjector injector;
-        private readonly IUserContext userContext;
+        private readonly IResolver graphqlResolver;
 
-        public GraphQLController(GraphQLEngine engine, IUserContext userContext, IDependencyInjector injector)
+        public GraphQLController(IResolver resolver)
         {
-            this.engine = engine;
-            this.userContext = userContext;
-            this.injector = injector;
+            this.graphqlResolver = resolver;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post()
         {
-            string requestBody;
-            using (var reader = new StreamReader(this.Request.Body))
-            {
-                requestBody = await reader.ReadToEndAsync();
-            }
-
-            var result = await this.engine
-                .NewExecutor()
-                .WithUserContext(this.userContext)
-                .WithDependencyInjector(this.injector)
-                .WithRequest(requestBody)
-                .Execute();
-
-            var responseBody = this.engine.SerializeResult(result);
-
-            var statusCode = HttpStatusCode.OK;
-
-            if (result.Errors?.Any() ?? false)
-            {
-                statusCode = HttpStatusCode.InternalServerError;
-                if (result.Errors.Any(x => x.Code == "VALIDATION_ERROR"))
-                {
-                    statusCode = HttpStatusCode.BadRequest;
-                }
-                else if (result.Errors.Any(x => x.Code == "UNAUTHORIZED_ACCESS"))
-                {
-                    statusCode = HttpStatusCode.Forbidden;
-                }
-            }
-
+            var response = await this.graphqlResolver.Resolve(this.Request.Body);
             return new ContentResult
             {
-                Content = responseBody,
+                Content = response.Content,
                 ContentType = "application/json; charset=utf-8",
-                StatusCode = (int) statusCode
+                StatusCode = response.StatusCode
             };
         }
     }

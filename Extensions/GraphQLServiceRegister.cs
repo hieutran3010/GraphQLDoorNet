@@ -25,18 +25,7 @@
 
             services.AddScoped(typeof(TMutation));
             services.AddScoped(typeof(EntityMutationBase<,>));
-
-            services.AddScoped<IResolver, DefaultResolver>();
-
-            RegisterMutations(services);
-            RegisterQueries(services);
             
-            services.AddScoped<IUserContext, UserContext>();
-            services.AddScoped<DataLoaderContext>();
-        }
-
-        private static void RegisterMutations(IServiceCollection services)
-        {
             var mutationTypes = Assembly.GetCallingAssembly().GetTypes()
                 .Where(t => t.GetCustomAttributes(typeof(ExtendMutationAttribute), true).Length > 0);
 
@@ -44,10 +33,7 @@
             {
                 services.AddScoped(mutationType);
             }
-        }
-        
-        private static void RegisterQueries(IServiceCollection services)
-        {
+            
             var queryTypes = Assembly.GetCallingAssembly().GetTypes()
                 .Where(t => t.GetCustomAttributes(typeof(ExtendQueryAttribute), true).Length > 0);
 
@@ -55,6 +41,11 @@
             {
                 services.AddScoped(queryType);
             }
+            
+            services.AddScoped<IResolver, DefaultResolver>();
+
+            services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<DataLoaderContext>();
         }
     }
 }

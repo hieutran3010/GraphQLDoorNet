@@ -1,5 +1,4 @@
-﻿
-namespace GraphQLDoorNet.Extensions
+﻿namespace GraphQLDoorNet.Extensions
 {
     using Abstracts;
     using global::GraphQL.Conventions;
@@ -7,7 +6,7 @@ namespace GraphQLDoorNet.Extensions
     using System.Linq;
     using System.Reflection;
     using Attributes;
-
+    using GraphQL.DataLoader;
 
     public static class GraphQLServiceRegister
     {
@@ -26,19 +25,36 @@ namespace GraphQLDoorNet.Extensions
 
             services.AddScoped(typeof(TMutation));
             services.AddScoped(typeof(EntityMutationBase<,>));
-            services.AddScoped<IUserContext, DefaultUserContext>();
-            
+
             services.AddScoped<IResolver, DefaultResolver>();
+
+            RegisterMutations(services);
+            RegisterQueries(services);
             
+            services.AddScoped<IUserContext, UserContext>();
+            services.AddScoped<DataLoaderContext>();
+        }
+
+        private static void RegisterMutations(IServiceCollection services)
+        {
             var mutationTypes = Assembly.GetCallingAssembly().GetTypes()
-                .Where(t => t.GetCustomAttributes(typeof(MutationAttribute), true).Length > 0);
+                .Where(t => t.GetCustomAttributes(typeof(ExtendMutationAttribute), true).Length > 0);
 
             foreach (var mutationType in mutationTypes)
             {
                 services.AddScoped(mutationType);
             }
-            
-            ObjectMapper.Mapping();
+        }
+        
+        private static void RegisterQueries(IServiceCollection services)
+        {
+            var queryTypes = Assembly.GetCallingAssembly().GetTypes()
+                .Where(t => t.GetCustomAttributes(typeof(ExtendQueryAttribute), true).Length > 0);
+
+            foreach (var queryType in queryTypes)
+            {
+                services.AddScoped(queryType);
+            }
         }
     }
 }

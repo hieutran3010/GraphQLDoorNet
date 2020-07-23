@@ -12,12 +12,11 @@
         <RepositoryType>Git</RepositoryType>
         <PackageTags>GraphQL, GraphQL Net</PackageTags>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.1.2</PackageVersion>
+        <PackageVersion>1.2</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="GraphQL.Conventions" Version="2.5.3" />
-      <PackageReference Include="Mapster" Version="5.3.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
       <PackageReference Include="System.Linq.Dynamic.Core" Version="1.1.2" />
     </ItemGroup>

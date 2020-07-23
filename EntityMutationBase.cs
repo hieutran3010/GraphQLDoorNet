@@ -6,23 +6,24 @@
     using System.Threading.Tasks;
     using System.Linq.Dynamic.Core;
     using System.Linq;
-    using Mapster;
     using Models;
     using Abstracts;
 
     public class EntityMutationBase<T, TInput> where T : class, IEntityBase, new()
     {
         protected readonly IUnitOfWork UnitOfWork;
+        protected readonly IInputMapper InputMapper;
 
-        public EntityMutationBase(IUnitOfWork unitOfWork)
+        public EntityMutationBase(IUnitOfWork unitOfWork, IInputMapper inputMapper)
         {
             this.UnitOfWork = unitOfWork;
+            this.InputMapper = inputMapper;
         }
 
         public virtual async Task<T> Add(TInput input)
         {
             var repository = this.UnitOfWork.GetRepository<T>();
-            var entity = input.Adapt<T>();
+            var entity = this.InputMapper.Map<TInput, T>(input);
             await repository.AddAsync(entity);
             await this.UnitOfWork.SaveChangesAsync();
             return entity;
@@ -34,7 +35,7 @@
             var oldEntity = await repository.FindAsync(id);
             if (oldEntity != null)
             {
-                input.Adapt(oldEntity);
+                this.InputMapper.MapUpdate<TInput, T>(input, oldEntity);
                 await this.UnitOfWork.SaveChangesAsync();
             }
 
@@ -69,7 +70,7 @@
             {
                 throw new HttpRequestException("Invalid Inputs");
             }
-                
+
             if (inputs.Length > EnvironmentAccessor.Instance.MaximumItemsPerBatch)
             {
                 throw new HttpRequestException(
@@ -77,7 +78,7 @@
             }
 
             var repository = this.UnitOfWork.GetRepository<T>();
-            var entities = inputs.Adapt<T[]>();
+            var entities = this.InputMapper.Map<TInput[], T[]>(inputs);
             await repository.AddRangeAsync(entities);
             await this.UnitOfWork.SaveChangesAsync();
             return new HttpStatus
@@ -86,14 +87,14 @@
                 Code = "OK"
             };
         }
-        
+
         public virtual async Task<HttpStatus> DeleteBatch(Guid[] ids)
         {
             if (ids == null)
             {
                 throw new HttpRequestException("Invalid Inputs");
             }
-                
+
             if (ids.Length > EnvironmentAccessor.Instance.MaximumItemsPerBatch)
             {
                 throw new HttpRequestException(
@@ -107,21 +108,21 @@
                 repository.RemoveRange(entities);
                 await this.UnitOfWork.SaveChangesAsync();
             }
-          
+
             return new HttpStatus
             {
                 Id = (int) HttpStatusCode.OK,
                 Code = "OK"
             };
         }
-        
+
         public virtual async Task<HttpStatus> DeleteQueryable(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
                 throw new HttpRequestException("Invalid query");
             }
-                
+
             var repository = this.UnitOfWork.GetRepository<T>();
             var entities = repository.GetQueryable().Where(query);
             if (entities.Any())
@@ -129,7 +130,7 @@
                 repository.RemoveRange(entities);
                 await this.UnitOfWork.SaveChangesAsync();
             }
-          
+
             return new HttpStatus
             {
                 Id = (int) HttpStatusCode.OK,

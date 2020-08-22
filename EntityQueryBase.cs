@@ -47,7 +47,7 @@ namespace GraphQLDoorNet
             return result;
         }
 
-        public virtual async Task<MathResult> Sum(string query, string field)
+        public virtual async Task<MathResult> Sum(string query, string field, string sumFormula)
         {
             if (string.IsNullOrWhiteSpace(field))
             {
@@ -62,7 +62,7 @@ namespace GraphQLDoorNet
                 executor = executor.Where(query);
             }
 
-            var result = await Task.Run(() => executor.Select($"new ({field})").Sum(field));
+            var result = await Task.Run(() => executor.Select($"new ({field})").Sum(sumFormula));
 
             return new MathResult {Value = Convert.ToDouble(result)};
         }

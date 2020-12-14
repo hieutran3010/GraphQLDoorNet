@@ -19,6 +19,8 @@ namespace GraphQLDoorNet.Abstracts
         
         Task AddRangeAsync(params T[] entities);
         
+        Task<int> ExecuteSqlRawAsync(string sql);
+        
         IQueryable<T> GetByRawSql(string sql);
         
         /// <summary>

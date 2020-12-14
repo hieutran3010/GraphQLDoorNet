@@ -1,14 +1,14 @@
 namespace GraphQLDoorNet
 {
-    using System.IO;
     using System.Linq;
+    using System.IO;
     using System.Net;
     using System.Threading.Tasks;
     using GraphQL.Conventions;
     using Abstracts;
     using Models;
-    
-    public class DefaultResolver: IResolver
+
+    public class DefaultResolver : IResolver
     {
         private readonly GraphQLEngine engine;
         private readonly IDependencyInjector injector;
@@ -20,7 +20,7 @@ namespace GraphQLDoorNet
             this.userContext = userContext;
             this.injector = injector;
         }
-        
+
         public async Task<Response> Resolve(Stream body)
         {
             string requestBody;

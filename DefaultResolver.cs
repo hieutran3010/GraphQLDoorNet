@@ -1,24 +1,24 @@
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using GraphQL.Conventions;
+using GraphQLDoorNet.Abstracts;
+using GraphQLDoorNet.Models;
+
 namespace GraphQLDoorNet
 {
-    using System.Linq;
-    using System.IO;
-    using System.Net;
-    using System.Threading.Tasks;
-    using GraphQL.Conventions;
-    using Abstracts;
-    using Models;
-
     public class DefaultResolver : IResolver
     {
-        private readonly GraphQLEngine engine;
-        private readonly IDependencyInjector injector;
-        private readonly IUserContext userContext;
+        private readonly GraphQLEngine _engine;
+        private readonly IDependencyInjector _injector;
+        private readonly IUserContext _userContext;
 
         public DefaultResolver(GraphQLEngine engine, IUserContext userContext, IDependencyInjector injector)
         {
-            this.engine = engine;
-            this.userContext = userContext;
-            this.injector = injector;
+            _engine = engine;
+            _userContext = userContext;
+            _injector = injector;
         }
 
         public async Task<Response> Resolve(Stream body)
@@ -29,14 +29,14 @@ namespace GraphQLDoorNet
                 requestBody = await reader.ReadToEndAsync();
             }
 
-            var result = await this.engine
+            var result = await _engine
                 .NewExecutor()
-                .WithUserContext(userContext)
-                .WithDependencyInjector(this.injector)
+                .WithUserContext(_userContext)
+                .WithDependencyInjector(_injector)
                 .WithRequest(requestBody)
-                .Execute();
+                .ExecuteAsync();
 
-            var responseBody = this.engine.SerializeResult(result);
+            var responseBody = await _engine.SerializeResultAsync(result);
 
             var statusCode = HttpStatusCode.OK;
 

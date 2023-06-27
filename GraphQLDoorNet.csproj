@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
@@ -21,7 +21,7 @@
     <ItemGroup>
       <PackageReference Include="GraphQL.Conventions" Version="2.5.5" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
-      <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.11" />
+      <PackageReference Include="System.Linq.Dynamic.Core" Version="1.3.0" />
     </ItemGroup>
 
 </Project>
